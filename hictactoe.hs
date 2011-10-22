@@ -60,7 +60,7 @@ findSequence sequence list =
     else findSequence sequence $ tail list
 
 aiResponse :: [[Cell]] -> [[Cell]]
-aiResponse board = last $ possibleResponses board
+aiResponse board = maximumBy (\a b -> compare (evaluateBoard a) (evaluateBoard b)) $ possibleResponses board
 
 possibleResponses :: [[Cell]] -> [[[Cell]]]
 possibleResponses board =
@@ -68,6 +68,55 @@ possibleResponses board =
       heights = [0..((length $ last board)-1)]
   in  [ setCell x y Cross board | x <- widths, y <- heights, getCell x y board == Empty]
 
+evaluateBoard :: [[Cell]] -> Int
+evaluateBoard board = sum (map ratePattern (possiblePatterns board))
+
+possiblePatterns :: [[Cell]] -> [[Cell]]
+possiblePatterns board = (horizontalPatterns board) ++ (verticalPatterns board) ++ (diagonalPatternsNW board) ++ (diagonalPatternsNE board)
+
+horizontalPatterns :: [[Cell]] -> [[Cell]]
+horizontalPatterns board = concat $ map takeFives board
+
+takeFives :: [a] -> [[a]]
+takeFives list
+  | length list < 5  = [[]]
+  | length list == 5 = [list]
+  | otherwise        = [take 5 list] ++ (takeFives $ tail list)
+
+verticalPatterns :: [[Cell]] -> [[Cell]]
+verticalPatterns board = horizontalPatterns $ transpose board
+
+diagonalPatternsNW :: [[Cell]] -> [[Cell]]
+diagonalPatternsNW board =
+  map extractDiagonal $ concat $ map takeFives (transpose $ map takeFives board)
+
+extractDiagonal :: [[a]] -> [a]
+extractDiagonal [[a,_,_,_,_],[_,b,_,_,_],[_,_,c,_,_],[_,_,_,d,_],[_,_,_,_,e]] =
+  [a,b,c,d,e]
+extractDiagonal _ = []
+
+diagonalPatternsNE :: [[Cell]] -> [[Cell]]
+diagonalPatternsNE board = diagonalPatternsNW $ map (\r -> reverse r) board
+
+ratePattern :: [Cell] -> Int
+ratePattern pattern
+  | findPattern [Circle, Circle, Circle, Circle, Empty]        pattern = -10000
+  | findPattern [Circle, Circle, Circle, Empty, Circle, Empty] pattern = -10000
+  | findPattern [Empty, Circle, Circle, Circle, Empty, Circle] pattern = -10000
+  | findPattern [Empty, Circle, Circle, Circle, Empty]         pattern = -1000
+  | findPattern [Circle, Circle, Empty]                        pattern = -10
+  | findPattern [Circle, Empty, Circle, Empty]                 pattern = -10
+  | findPattern [Cross, Cross, Cross, Cross, Empty]        pattern = 5000
+  | findPattern [Cross, Cross, Cross, Empty, Cross, Empty] pattern = 5000
+  | findPattern [Empty, Cross, Cross, Cross, Empty, Cross] pattern = 5000
+  | findPattern [Empty, Cross, Cross, Cross, Empty]        pattern = 50
+  | findPattern [Cross, Cross, Empty]                      pattern = 5
+  | findPattern [Cross, Empty, Cross, Empty]               pattern = 5
+  | findPattern [Cross, Empty, Empty, Empty, Empty]        pattern = 1
+  | otherwise = 0
+
+findPattern :: [Cell] -> [Cell] -> Bool
+findPattern pattern list = (findSequence pattern list) || (findSequence (reverse pattern) list)
 
 
 main = getUserInput (generateBoard 11)
