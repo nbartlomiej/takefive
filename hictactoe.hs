@@ -16,11 +16,8 @@ getCell x y board = (board !! x) !! y
 
 setCell :: Int -> Int -> Cell -> [[Cell]] -> [[Cell]] 
 setCell x y cell board =
--- Translating values, coordinates shall start from one, not from zero.
-  let tx = x-1
-      ty = y-1
-      substitutedRow = (changeAtIndex ty cell (board !! tx))
-  in  changeAtIndex tx substitutedRow board
+  let substitutedRow = (changeAtIndex y cell (board !! x))
+  in  changeAtIndex x substitutedRow board
 
 indexize :: [a] -> [(Int, a)]
 indexize list = zip [0..(length list)] list
@@ -109,8 +106,9 @@ processUserInput :: String -> [[Cell]] -> IO ()
 processUserInput "q" _ = print "Bye!"
 processUserInput input board =
   let (x,y) = break (==',') input
-      ix = read x
-      iy = read $ tail y
+      -- Translating values, coordinates will start from one, not from zero.
+      ix = (read x) -1
+      iy = (read $ tail y) -1
       userResponse = setCell ix iy Circle board
       newBoard     = if gameFinished board
           then userResponse
