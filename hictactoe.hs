@@ -113,7 +113,7 @@ processUserInput input board =
       ix = (read x) -1
       iy = (read $ tail y) -1
       userResponse = setCell ix iy Circle board
-      newBoard     = if gameFinished board
+      newBoard     = if gameFinished userResponse
           then userResponse
           else aiResponse userResponse
   in getUserInput newBoard
