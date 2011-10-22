@@ -121,7 +121,9 @@ ratePattern pattern
   | otherwise = 0
 
 findPattern :: [Cell] -> [Cell] -> Bool
-findPattern pattern list = (findSequence pattern list) || (findSequence (reverse pattern) list)
+findPattern pattern list 
+  | length pattern == 5 = (list == pattern) || (list == (reverse pattern))
+  | otherwise = (findSequence pattern list) || (findSequence (reverse pattern) list)
 
 
 main = getUserInput (generateBoard 11)
