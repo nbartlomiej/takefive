@@ -47,10 +47,10 @@ checkDiagonalNW player [[a,_,_,_,_],[_,b,_,_,_],[_,_,c,_,_],[_,_,_,d,_],[_,_,_,_
 checkDiagonalNW player board =
   if (length board) < 5 || any (\row -> (length row) < 5) board
     then False
-    else checkDiagonalNE player (map (\row -> take 5 row) (take 5 board)) || checkDiagonalNE player (tail board) || checkDiagonalNE player (map (\row -> tail row) board)
+    else checkDiagonalNW player (map (\row -> take 5 row) (take 5 board)) || checkDiagonalNW player (tail board) || checkDiagonalNW player (map (\row -> tail row) board)
 
 checkDiagonalNE :: Cell -> [[Cell]] -> Bool
-checkDiagonalNE player board = checkDiagonalNW player $ transpose board
+checkDiagonalNE player board = checkDiagonalNW player $ map (\r -> reverse r) board
 
 findSequence :: (Eq a) =>  [a] -> [a] -> Bool
 findSequence _ [] = False
