@@ -59,6 +59,8 @@ findSequence sequence list =
     then True
     else findSequence sequence $ tail list
 
+aiResponse :: [[Cell]] -> [[Cell]]
+aiResponse board = board
 
 
 
@@ -88,7 +90,8 @@ processUserInput "q" _ = print "Bye!"
 processUserInput (x:',':y:[]) board =
   let ix = read (x:[])
       iy = read (y:[])
-      newBoard = changeCell ix iy Circle board
+      userResponse = changeCell ix iy Circle board
+      newBoard     = aiResponse userResponse
   in getUserInput newBoard
 processUserInput _ board = getUserInput board
 
