@@ -100,19 +100,24 @@ diagonalPatternsNE board = diagonalPatternsNW $ map (\r -> reverse r) board
 
 ratePattern :: [Cell] -> Int
 ratePattern pattern
-  | findPattern [Circle, Circle, Circle, Circle, Empty]        pattern = -10000
-  | findPattern [Circle, Circle, Circle, Empty, Circle, Empty] pattern = -10000
-  | findPattern [Empty, Circle, Circle, Circle, Empty, Circle] pattern = -10000
-  | findPattern [Empty, Circle, Circle, Circle, Empty]         pattern = -1000
-  | findPattern [Circle, Circle, Empty]                        pattern = -10
-  | findPattern [Circle, Empty, Circle, Empty]                 pattern = -10
-  | findPattern [Cross, Cross, Cross, Cross, Empty]        pattern = 5000
-  | findPattern [Cross, Cross, Cross, Empty, Cross, Empty] pattern = 5000
-  | findPattern [Empty, Cross, Cross, Cross, Empty, Cross] pattern = 5000
-  | findPattern [Empty, Cross, Cross, Cross, Empty]        pattern = 50
-  | findPattern [Cross, Cross, Empty]                      pattern = 5
-  | findPattern [Cross, Empty, Cross, Empty]               pattern = 5
-  | findPattern [Cross, Empty, Empty, Empty, Empty]        pattern = 1
+  | findPattern [Circle, Circle, Circle, Circle, Empty] pattern = -10000
+  | findPattern [Circle, Circle, Circle, Empty, Circle] pattern = -10000
+  | findPattern [Circle, Circle, Empty, Circle, Circle] pattern = -10000
+  | findPattern [Empty, Circle, Circle, Circle, Empty]  pattern = -1000
+  | findPattern [Empty, Circle, Empty, Circle, Circle]  pattern = -600
+  | findPattern [Circle, Empty, Circle, Circle, Empty]  pattern = -600
+  | findPattern [Circle, Circle, Empty]                 pattern = -10
+  | findPattern [Circle, Empty, Circle, Empty]          pattern = -10
+  | findPattern [Cross, Cross, Cross, Cross, Cross] pattern = 100000000
+  | findPattern [Cross, Cross, Cross, Cross, Empty] pattern = 5000
+  | findPattern [Cross, Cross, Cross, Empty, Cross] pattern = 5000
+  | findPattern [Cross, Cross, Empty, Cross, Cross] pattern = 5000
+  | findPattern [Empty, Cross, Cross, Cross, Empty] pattern = 50
+  | findPattern [Empty, Cross, Empty, Cross, Cross] pattern = 24
+  | findPattern [Cross, Empty, Cross, Cross, Empty] pattern = 24
+  | findPattern [Cross, Cross, Empty]               pattern = 5
+  | findPattern [Cross, Empty, Cross, Empty]        pattern = 5
+  | findPattern [Cross, Empty, Empty, Empty, Empty] pattern = 1
   | otherwise = 0
 
 findPattern :: [Cell] -> [Cell] -> Bool
