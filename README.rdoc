@@ -16,5 +16,5 @@ MIT license, for details please see the LICENSE file.
 
 ==Helpful links
 
-* Very good book, Learn You a Haskell for Great Good: http://learnyouahaskell.com/
+* Very good book for Haskell beginners, Learn You a Haskell for Great Good: http://learnyouahaskell.com/
 * Haskell libraries documentation: http://www.haskell.org/ghc/docs/latest/html/libraries/index.html and the most often used page: http://www.haskell.org/ghc/docs/latest/html/libraries/base-4.4.0.0/Data-List.html
