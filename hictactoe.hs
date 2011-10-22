@@ -11,8 +11,11 @@ instance Show Cell where
 generateBoard :: Int -> [[Cell]]
 generateBoard size = [ [Empty | x <- [1..size]] | y <- [1..size]]
 
-changeCell :: Int -> Int -> Cell -> [[Cell]] -> [[Cell]] 
-changeCell x y cell board =
+getCell :: Int -> Int -> [[Cell]] -> Cell
+getCell x y board = (board !! x) !! y
+
+setCell :: Int -> Int -> Cell -> [[Cell]] -> [[Cell]] 
+setCell x y cell board =
 -- Translating values, coordinates shall start from one, not from zero.
   let tx = x-1
       ty = y-1
@@ -62,6 +65,9 @@ findSequence sequence list =
 aiResponse :: [[Cell]] -> [[Cell]]
 aiResponse board = board
 
+boardPatterns :: [[Cell]] -> [[Cell]]
+boardPatterns board = [[]]
+
 
 
 main = getUserInput (generateBoard 9)
@@ -93,8 +99,10 @@ processUserInput "q" _ = print "Bye!"
 processUserInput (x:',':y:[]) board =
   let ix = read (x:[])
       iy = read (y:[])
-      userResponse = changeCell ix iy Circle board
-      newBoard     = aiResponse userResponse
+      userResponse = setCell ix iy Circle board
+      newBoard     = if gameFinished board
+          then userResponse
+          else aiResponse userResponse
   in getUserInput newBoard
 processUserInput _ board = getUserInput board
 
