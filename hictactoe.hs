@@ -56,16 +56,19 @@ findSequence sequence list =
     then True
     else findSequence sequence $ tail list
 
-main = game "input" (generateBoard 9)
+main = getUserInput (generateBoard 9)
 
 game :: String -> [[Cell]] -> IO ()
 game "q" _ = print "Bye!"
-game (x:',':y:[]) board = let ix = read (x:[])
-                              iy = read (y:[])
-                              newBoard = changeCell ix iy Circle board
-                          in game "input" newBoard
+game (x:',':y:[]) board =
+  let ix = read (x:[])
+      iy = read (y:[])
+      newBoard = changeCell ix iy Circle board
+  in getUserInput newBoard
+game _ board = getUserInput board
 
-game "input" board = do
+getUserInput :: [[Cell]] -> IO ()
+getUserInput board = do
   print instructions
   mapM_ (\row -> print row) board
   input <- getLine
