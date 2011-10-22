@@ -70,10 +70,21 @@ boardPatterns board = [[]]
 
 
 
-main = getUserInput (generateBoard 9)
+main = getUserInput (generateBoard 11)
 
 printBoard :: [[Cell]] -> IO ()
-printBoard board = mapM_ (\row -> print row) board
+printBoard board =
+  let indexedBoard = indexize board
+  in  do
+    -- Numbers on top of the board.
+    mapM_ (\c -> putChar c) "  "
+    mapM_ (\i -> do
+      putChar $ last $ show i
+      putChar ' '
+      ) [1..(length board)]
+    putChar '\n'
+    -- Board rows.
+    mapM_ (\(i,row) -> print $ (show row) ++ " " ++ (show $ 1+i)) indexedBoard
 
 getUserInput :: [[Cell]] -> IO ()
 getUserInput board = do
@@ -96,14 +107,14 @@ declareWinner board = do
   
 processUserInput :: String -> [[Cell]] -> IO ()
 processUserInput "q" _ = print "Bye!"
-processUserInput (x:',':y:[]) board =
-  let ix = read (x:[])
-      iy = read (y:[])
+processUserInput input board =
+  let (x,y) = break (==',') input
+      ix = read x
+      iy = read $ tail y
       userResponse = setCell ix iy Circle board
       newBoard     = if gameFinished board
           then userResponse
           else aiResponse userResponse
   in getUserInput newBoard
-processUserInput _ board = getUserInput board
 
 instructions = "Input coordinates in format: x,y. Press 'q' to exit"
