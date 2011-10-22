@@ -1,0 +1,20 @@
+=takefive
+
+==About
+
+Takefive is a Five in a Row game (http://en.wikipedia.org/wiki/Gomoku) implemented in Haskell. Runs in console, features simple AI, done as a Haskell excercise.
+
+==Running
+
+    1. Cd into project directory
+    2. ghc takefive
+    3. ./takefive
+
+==License
+
+MIT license, for details please see the LICENSE file.
+
+==Helpful links
+
+* Very good book, Learn You a Haskell for Great Good: http://learnyouahaskell.com/
+* Haskell libraries documentation: http://www.haskell.org/ghc/docs/latest/html/libraries/index.html and the most often used page: http://www.haskell.org/ghc/docs/latest/html/libraries/base-4.4.0.0/Data-List.html
