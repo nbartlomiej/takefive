@@ -66,19 +66,22 @@ aiResponse board = board
 
 main = getUserInput (generateBoard 9)
 
+printBoard :: [[Cell]] -> IO ()
+printBoard board = mapM_ (\row -> print row) board
+
 getUserInput :: [[Cell]] -> IO ()
 getUserInput board = do
   if gameFinished board
     then declareWinner board
     else do
       print instructions
-      mapM_ (\row -> print row) board
+      printBoard board
       input <- getLine
       processUserInput input board
 
 declareWinner :: [[Cell]] -> IO ()
 declareWinner board = do
-  mapM_ (\row -> print row) board
+  printBoard board
   if gameWon Circle board
     then
       print "End of game, you win!"
