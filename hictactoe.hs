@@ -28,6 +28,9 @@ changeAtIndex index substitution list =
     if index == index_x then substitution else element
   ) $ indexize list
 
+gameFinished :: [[Cell]] -> Bool
+gameFinished board = (gameWon Circle board) || (gameWon Cross board)
+
 gameWon :: Cell -> [[Cell]] -> Bool
 gameWon player board = checkHorizontal player board || checkVertical player board || checkDiagonalNE player board || checkDiagonalNW player board
 
@@ -56,22 +59,37 @@ findSequence sequence list =
     then True
     else findSequence sequence $ tail list
 
+
+
+
 main = getUserInput (generateBoard 9)
 
-game :: String -> [[Cell]] -> IO ()
-game "q" _ = print "Bye!"
-game (x:',':y:[]) board =
+getUserInput :: [[Cell]] -> IO ()
+getUserInput board = do
+  if gameFinished board
+    then declareWinner board
+    else do
+      print instructions
+      mapM_ (\row -> print row) board
+      input <- getLine
+      processUserInput input board
+
+declareWinner :: [[Cell]] -> IO ()
+declareWinner board = do
+  mapM_ (\row -> print row) board
+  if gameWon Circle board
+    then
+      print "End of game, you win!"
+    else
+      print "End of game, the computer has won."
+  
+processUserInput :: String -> [[Cell]] -> IO ()
+processUserInput "q" _ = print "Bye!"
+processUserInput (x:',':y:[]) board =
   let ix = read (x:[])
       iy = read (y:[])
       newBoard = changeCell ix iy Circle board
   in getUserInput newBoard
-game _ board = getUserInput board
-
-getUserInput :: [[Cell]] -> IO ()
-getUserInput board = do
-  print instructions
-  mapM_ (\row -> print row) board
-  input <- getLine
-  game input board
+processUserInput _ board = getUserInput board
 
 instructions = "Input coordinates in format: x,y. Press 'q' to exit"
