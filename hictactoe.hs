@@ -60,10 +60,13 @@ findSequence sequence list =
     else findSequence sequence $ tail list
 
 aiResponse :: [[Cell]] -> [[Cell]]
-aiResponse board = board
+aiResponse board = last $ possibleResponses board
 
-boardPatterns :: [[Cell]] -> [[Cell]]
-boardPatterns board = [[]]
+possibleResponses :: [[Cell]] -> [[[Cell]]]
+possibleResponses board =
+  let widths  = [0..((length board)-1)]
+      heights = [0..((length $ last board)-1)]
+  in  [ setCell x y Cross board | x <- widths, y <- heights, getCell x y board == Empty]
 
 
 
@@ -73,7 +76,7 @@ printBoard :: [[Cell]] -> IO ()
 printBoard board =
   let indexedBoard = indexize board
   in  do
-    -- Numbers on top of the board.
+    -- Numbers on top of the board, i.e.: 1 2 3 4 ...
     mapM_ (\c -> putChar c) "  "
     mapM_ (\i -> do
       putChar $ last $ show i
