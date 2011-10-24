@@ -8,13 +8,15 @@ instance Show Cell where
   show Circle = "o"
   show Cross  = "x"
 
-generateBoard :: Int -> [[Cell]]
+type Board = [[Cell]]
+
+generateBoard :: Int -> Board
 generateBoard size = [ [Empty | x <- [1..size]] | y <- [1..size]]
 
-getCell :: Int -> Int -> [[Cell]] -> Cell
+getCell :: Int -> Int -> Board -> Cell
 getCell x y board = (board !! x) !! y
 
-setCell :: Int -> Int -> Cell -> [[Cell]] -> [[Cell]] 
+setCell :: Int -> Int -> Cell -> Board -> Board 
 setCell x y cell board =
   let newRow = (replace y cell (board !! x))
   in  replace x newRow board
@@ -24,20 +26,20 @@ replace _ _ [] = []
 replace 0 substitute list = substitute:(tail list)
 replace n substitute list = (head list):(replace (n-1) substitute (tail list))
 
-gameFinished :: [[Cell]] -> Bool
+gameFinished :: Board -> Bool
 gameFinished board = (gameWon Circle board) || (gameWon Cross board)
 
-gameWon :: Cell -> [[Cell]] -> Bool
+gameWon :: Cell -> Board -> Bool
 gameWon player board = checkHorizontal player board || checkVertical player board || checkDiagonalNE player board || checkDiagonalNW player board
 
-checkHorizontal :: Cell -> [[Cell]] -> Bool
+checkHorizontal :: Cell -> Board -> Bool
 checkHorizontal player board =
   any (\ row -> findSequence ( take 5 $ repeat player) row ) board
   
-checkVertical :: Cell -> [[Cell]] -> Bool
+checkVertical :: Cell -> Board -> Bool
 checkVertical player board = checkHorizontal player $ transpose board
 
-checkDiagonalNW :: Cell -> [[Cell]] -> Bool
+checkDiagonalNW :: Cell -> Board -> Bool
 checkDiagonalNW player [[a,_,_,_,_],[_,b,_,_,_],[_,_,c,_,_],[_,_,_,d,_],[_,_,_,_,e]] =
   player == a && a == b && b == c && c == d && d == e
 checkDiagonalNW player board =
@@ -45,7 +47,7 @@ checkDiagonalNW player board =
     then False
     else checkDiagonalNW player (map (\row -> take 5 row) (take 5 board)) || checkDiagonalNW player (tail board) || checkDiagonalNW player (map (\row -> tail row) board)
 
-checkDiagonalNE :: Cell -> [[Cell]] -> Bool
+checkDiagonalNE :: Cell -> Board -> Bool
 checkDiagonalNE player board = checkDiagonalNW player $ map (\r -> reverse r) board
 
 findSequence :: (Eq a) =>  [a] -> [a] -> Bool
@@ -55,22 +57,22 @@ findSequence sequence list =
     then True
     else findSequence sequence $ tail list
 
-aiResponse :: [[Cell]] -> [[Cell]]
+aiResponse :: Board -> Board
 aiResponse board = maximumBy (\a b -> compare (evaluateBoard a) (evaluateBoard b)) $ possibleResponses board
 
-possibleResponses :: [[Cell]] -> [[[Cell]]]
+possibleResponses :: Board -> [Board]
 possibleResponses board =
   let widths  = [0..((length board)-1)]
       heights = [0..((length $ last board)-1)]
   in  [ setCell x y Cross board | x <- widths, y <- heights, getCell x y board == Empty]
 
-evaluateBoard :: [[Cell]] -> Int
+evaluateBoard :: Board -> Int
 evaluateBoard board = sum (map ratePattern (possiblePatterns board))
 
-possiblePatterns :: [[Cell]] -> [[Cell]]
+possiblePatterns :: Board -> [[Cell]]
 possiblePatterns board = (horizontalPatterns board) ++ (verticalPatterns board) ++ (diagonalPatternsNW board) ++ (diagonalPatternsNE board)
 
-horizontalPatterns :: [[Cell]] -> [[Cell]]
+horizontalPatterns :: Board -> [[Cell]]
 horizontalPatterns board = concat $ map takeFives board
 
 takeFives :: [a] -> [[a]]
@@ -79,10 +81,10 @@ takeFives list
   | length list == 5 = [list]
   | otherwise        = [take 5 list] ++ (takeFives $ tail list)
 
-verticalPatterns :: [[Cell]] -> [[Cell]]
+verticalPatterns :: Board -> [[Cell]]
 verticalPatterns board = horizontalPatterns $ transpose board
 
-diagonalPatternsNW :: [[Cell]] -> [[Cell]]
+diagonalPatternsNW :: Board -> [[Cell]]
 diagonalPatternsNW board =
   map extractDiagonal $ concat $ map takeFives (transpose $ map takeFives board)
 
@@ -91,7 +93,7 @@ extractDiagonal [[a,_,_,_,_],[_,b,_,_,_],[_,_,c,_,_],[_,_,_,d,_],[_,_,_,_,e]] =
   [a,b,c,d,e]
 extractDiagonal _ = []
 
-diagonalPatternsNE :: [[Cell]] -> [[Cell]]
+diagonalPatternsNE :: Board -> [[Cell]]
 diagonalPatternsNE board = diagonalPatternsNW $ map (\r -> reverse r) board
 
 ratePattern :: [Cell] -> Int
@@ -124,7 +126,7 @@ findPattern pattern list
 
 main = getUserInput (generateBoard 11)
 
-printBoard :: [[Cell]] -> IO ()
+printBoard :: Board -> IO ()
 printBoard board =
   let indexedBoard = zip [0..(length board)] board
   in  do
@@ -138,7 +140,7 @@ printBoard board =
     -- Board rows.
     mapM_ (\(i,row) -> print $ (show row) ++ " " ++ (show $ 1+i)) indexedBoard
 
-getUserInput :: [[Cell]] -> IO ()
+getUserInput :: Board -> IO ()
 getUserInput board = do
   if gameFinished board
     then declareWinner board
@@ -148,7 +150,7 @@ getUserInput board = do
       input <- getLine
       processUserInput input board
 
-declareWinner :: [[Cell]] -> IO ()
+declareWinner :: Board -> IO ()
 declareWinner board = do
   printBoard board
   if gameWon Circle board
@@ -157,7 +159,7 @@ declareWinner board = do
     else
       print "End of game, the computer has won."
   
-processUserInput :: String -> [[Cell]] -> IO ()
+processUserInput :: String -> Board -> IO ()
 processUserInput "q" _ = print "Bye!"
 processUserInput input board =
   let (x,y) = break (==',') input
