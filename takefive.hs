@@ -16,17 +16,13 @@ getCell x y board = (board !! x) !! y
 
 setCell :: Int -> Int -> Cell -> [[Cell]] -> [[Cell]] 
 setCell x y cell board =
-  let substitutedRow = (changeAtIndex y cell (board !! x))
-  in  changeAtIndex x substitutedRow board
+  let newRow = (replace y cell (board !! x))
+  in  replace x newRow board
 
-indexize :: [a] -> [(Int, a)]
-indexize list = zip [0..(length list)] list
-
-changeAtIndex :: Int -> a -> [a] -> [a]
-changeAtIndex index substitution list =
-  map (\ (index_x, element) ->
-    if index == index_x then substitution else element
-  ) $ indexize list
+replace :: Int -> a -> [a] -> [a]
+replace _ _ [] = []
+replace 0 substitute list = substitute:(tail list)
+replace n substitute list = (head list):(replace (n-1) substitute (tail list))
 
 gameFinished :: [[Cell]] -> Bool
 gameFinished board = (gameWon Circle board) || (gameWon Cross board)
@@ -130,7 +126,7 @@ main = getUserInput (generateBoard 11)
 
 printBoard :: [[Cell]] -> IO ()
 printBoard board =
-  let indexedBoard = indexize board
+  let indexedBoard = zip [0..(length board)] board
   in  do
     -- Numbers on top of the board, i.e.: 1 2 3 4 ...
     mapM_ (\c -> putChar c) "  "
