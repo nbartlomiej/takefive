@@ -31,25 +31,7 @@ gameFinished :: Board -> Bool
 gameFinished board = (gameWon Circle board) || (gameWon Cross board)
 
 gameWon :: Cell -> Board -> Bool
-gameWon player board = checkHorizontal player board || checkVertical player board || checkDiagonalNE player board || checkDiagonalNW player board
-
-checkHorizontal :: Cell -> Board -> Bool
-checkHorizontal player board =
-  any (\ row -> findSequence ( take 5 $ repeat player) row ) board
-  
-checkVertical :: Cell -> Board -> Bool
-checkVertical player board = checkHorizontal player $ transpose board
-
-checkDiagonalNW :: Cell -> Board -> Bool
-checkDiagonalNW player [[a,_,_,_,_],[_,b,_,_,_],[_,_,c,_,_],[_,_,_,d,_],[_,_,_,_,e]] =
-  player == a && a == b && b == c && c == d && d == e
-checkDiagonalNW player board =
-  if (length board) < 5 || any (\row -> (length row) < 5) board
-    then False
-    else checkDiagonalNW player (map (\row -> take 5 row) (take 5 board)) || checkDiagonalNW player (tail board) || checkDiagonalNW player (map (\row -> tail row) board)
-
-checkDiagonalNE :: Cell -> Board -> Bool
-checkDiagonalNE player board = checkDiagonalNW player $ map (\r -> reverse r) board
+gameWon player board = any (== (take 5 (repeat player))) (possiblePatterns board)
 
 findSequence :: (Eq a) =>  [a] -> [a] -> Bool
 findSequence _ [] = False
