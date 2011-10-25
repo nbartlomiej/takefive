@@ -8,7 +8,8 @@ instance Show Cell where
   show Circle = "o"
   show Cross  = "x"
 
-type Board = [[Cell]]
+type Board   = [[Cell]]
+type Pattern = [Cell]
 
 generateBoard :: Int -> Board
 generateBoard size = [ [Empty | x <- [1..size]] | y <- [1..size]]
@@ -69,10 +70,10 @@ possibleResponses board =
 evaluateBoard :: Board -> Int
 evaluateBoard board = sum (map ratePattern (possiblePatterns board))
 
-possiblePatterns :: Board -> [[Cell]]
+possiblePatterns :: Board -> [Pattern]
 possiblePatterns board = (horizontalPatterns board) ++ (verticalPatterns board) ++ (diagonalPatternsNW board) ++ (diagonalPatternsNE board)
 
-horizontalPatterns :: Board -> [[Cell]]
+horizontalPatterns :: Board -> [Pattern]
 horizontalPatterns board = concat $ map takeFives board
 
 takeFives :: [a] -> [[a]]
@@ -81,10 +82,10 @@ takeFives list
   | length list == 5 = [list]
   | otherwise        = [take 5 list] ++ (takeFives $ tail list)
 
-verticalPatterns :: Board -> [[Cell]]
+verticalPatterns :: Board -> [Pattern]
 verticalPatterns board = horizontalPatterns $ transpose board
 
-diagonalPatternsNW :: Board -> [[Cell]]
+diagonalPatternsNW :: Board -> [Pattern]
 diagonalPatternsNW board =
   map extractDiagonal $ concat $ map takeFives (transpose $ map takeFives board)
 
@@ -93,10 +94,10 @@ extractDiagonal [[a,_,_,_,_],[_,b,_,_,_],[_,_,c,_,_],[_,_,_,d,_],[_,_,_,_,e]] =
   [a,b,c,d,e]
 extractDiagonal _ = []
 
-diagonalPatternsNE :: Board -> [[Cell]]
+diagonalPatternsNE :: Board -> [Pattern]
 diagonalPatternsNE board = diagonalPatternsNW $ map (\r -> reverse r) board
 
-ratePattern :: [Cell] -> Int
+ratePattern :: Pattern -> Int
 ratePattern pattern
   | findPattern [Circle, Circle, Circle, Circle, Empty] pattern = -10000
   | findPattern [Circle, Circle, Circle, Empty, Circle] pattern = -10000
@@ -118,7 +119,7 @@ ratePattern pattern
   | findPattern [Cross, Empty, Empty, Empty, Empty] pattern = 1
   | otherwise = 0
 
-findPattern :: [Cell] -> [Cell] -> Bool
+findPattern :: Pattern -> Pattern -> Bool
 findPattern pattern list 
   | length pattern == 5 = (list == pattern) || (list == (reverse pattern))
   | otherwise = (findSequence pattern list) || (findSequence (reverse pattern) list)
