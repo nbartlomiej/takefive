@@ -33,13 +33,6 @@ gameFinished board = (gameWon Circle board) || (gameWon Cross board)
 gameWon :: Cell -> Board -> Bool
 gameWon player board = any (== (take 5 (repeat player))) (possiblePatterns board)
 
-findSequence :: (Eq a) =>  [a] -> [a] -> Bool
-findSequence _ [] = False
-findSequence sequence list =
-  if take (length sequence) list == sequence
-    then True
-    else findSequence sequence $ tail list
-
 aiResponse :: Board -> Board
 aiResponse board = maximumBy (\a b -> compare (evaluateBoard a) (evaluateBoard b)) $ possibleResponses board
 
@@ -58,12 +51,6 @@ possiblePatterns board = (horizontalPatterns board) ++ (verticalPatterns board) 
 horizontalPatterns :: Board -> [Pattern]
 horizontalPatterns board = concat $ map takeFives board
 
-takeFives :: [a] -> [[a]]
-takeFives list
-  | length list < 5  = [[]]
-  | length list == 5 = [list]
-  | otherwise        = [take 5 list] ++ (takeFives $ tail list)
-
 verticalPatterns :: Board -> [Pattern]
 verticalPatterns board = horizontalPatterns $ transpose board
 
@@ -71,40 +58,54 @@ diagonalPatternsNW :: Board -> [Pattern]
 diagonalPatternsNW board =
   map extractDiagonal $ concat $ map takeFives (transpose $ map takeFives board)
 
+diagonalPatternsNE :: Board -> [Pattern]
+diagonalPatternsNE board = diagonalPatternsNW $ map (\r -> reverse r) board
+
+ratePattern :: Pattern -> Int
+ratePattern pattern =
+  let patterns = [
+        ([Circle, Circle, Circle, Circle, Empty ], -10000),
+        ([Circle, Circle, Circle, Empty, Circle ], -10000),
+        ([Circle, Circle, Empty, Circle, Circle ], -10000),
+        ([Empty, Circle, Circle, Circle, Empty  ], -1000),
+        ([Empty, Circle, Empty, Circle, Circle  ], -600),
+        ([Circle, Empty, Circle, Circle, Empty  ], -600),
+        ([Circle, Circle, Empty                 ], -10),
+        ([Circle, Empty, Circle, Empty          ], -10),
+        ([Cross, Cross, Cross, Cross, Cross     ], 100000000),
+        ([Cross, Cross, Cross, Cross, Empty     ], 5000),
+        ([Cross, Cross, Cross, Empty, Cross     ], 5000),
+        ([Cross, Cross, Empty, Cross, Cross     ], 5000),
+        ([Empty, Cross, Cross, Cross, Empty     ], 50),
+        ([Empty, Cross, Empty, Cross, Cross     ], 24),
+        ([Cross, Empty, Cross, Cross, Empty     ], 24),
+        ([Cross, Cross, Empty                   ], 5),
+        ([Cross, Empty, Cross, Empty            ], 5),
+        ([Cross, Empty, Empty, Empty, Empty     ], 1) ]
+      findPatternWithMirrored p s = findPattern p s || findPattern (reverse p) s
+      getPatternEntry p = find (\(r,i)->findPatternWithMirrored r p) patterns
+      extractRating (Just (a,b)) = b
+      extractRating Nothing = 0
+  in  extractRating $ getPatternEntry pattern
+
+takeFives :: [a] -> [[a]]
+takeFives list
+  | length list >= 5 = [take 5 list] ++ (takeFives $ tail list)
+  | otherwise        = []
+
 extractDiagonal :: [[a]] -> [a]
 extractDiagonal [[a,_,_,_,_],[_,b,_,_,_],[_,_,c,_,_],[_,_,_,d,_],[_,_,_,_,e]] =
   [a,b,c,d,e]
 extractDiagonal _ = []
 
-diagonalPatternsNE :: Board -> [Pattern]
-diagonalPatternsNE board = diagonalPatternsNW $ map (\r -> reverse r) board
-
-ratePattern :: Pattern -> Int
-ratePattern pattern
-  | findPattern [Circle, Circle, Circle, Circle, Empty] pattern = -10000
-  | findPattern [Circle, Circle, Circle, Empty, Circle] pattern = -10000
-  | findPattern [Circle, Circle, Empty, Circle, Circle] pattern = -10000
-  | findPattern [Empty, Circle, Circle, Circle, Empty]  pattern = -1000
-  | findPattern [Empty, Circle, Empty, Circle, Circle]  pattern = -600
-  | findPattern [Circle, Empty, Circle, Circle, Empty]  pattern = -600
-  | findPattern [Circle, Circle, Empty]                 pattern = -10
-  | findPattern [Circle, Empty, Circle, Empty]          pattern = -10
-  | findPattern [Cross, Cross, Cross, Cross, Cross] pattern = 100000000
-  | findPattern [Cross, Cross, Cross, Cross, Empty] pattern = 5000
-  | findPattern [Cross, Cross, Cross, Empty, Cross] pattern = 5000
-  | findPattern [Cross, Cross, Empty, Cross, Cross] pattern = 5000
-  | findPattern [Empty, Cross, Cross, Cross, Empty] pattern = 50
-  | findPattern [Empty, Cross, Empty, Cross, Cross] pattern = 24
-  | findPattern [Cross, Empty, Cross, Cross, Empty] pattern = 24
-  | findPattern [Cross, Cross, Empty]               pattern = 5
-  | findPattern [Cross, Empty, Cross, Empty]        pattern = 5
-  | findPattern [Cross, Empty, Empty, Empty, Empty] pattern = 1
-  | otherwise = 0
-
-findPattern :: Pattern -> Pattern -> Bool
-findPattern pattern list 
-  | length pattern == 5 = (list == pattern) || (list == (reverse pattern))
-  | otherwise = (findSequence pattern list) || (findSequence (reverse pattern) list)
+findPattern :: (Eq a) =>  [a] -> [a] -> Bool
+findPattern _ [] = False
+findPattern sequence list =
+  if length sequence == length list
+    then sequence == list
+    else if take (length sequence) list == sequence
+      then True
+      else findPattern sequence $ tail list
 
 
 main = getUserInput (generateBoard 11)
