@@ -64,24 +64,24 @@ diagonalPatternsNE board = diagonalPatternsNW $ map (\r -> reverse r) board
 ratePattern :: Pattern -> Int
 ratePattern pattern =
   let patterns = [
-        ([Circle, Circle, Circle, Circle, Empty ], -10000),
-        ([Circle, Circle, Circle, Empty, Circle ], -10000),
-        ([Circle, Circle, Empty, Circle, Circle ], -10000),
-        ([Empty, Circle, Circle, Circle, Empty  ], -1000),
-        ([Empty, Circle, Empty, Circle, Circle  ], -600),
-        ([Circle, Empty, Circle, Circle, Empty  ], -600),
-        ([Circle, Circle, Empty                 ], -10),
-        ([Circle, Empty, Circle, Empty          ], -10),
-        ([Cross, Cross, Cross, Cross, Cross     ], 100000000),
-        ([Cross, Cross, Cross, Cross, Empty     ], 5000),
-        ([Cross, Cross, Cross, Empty, Cross     ], 5000),
-        ([Cross, Cross, Empty, Cross, Cross     ], 5000),
-        ([Empty, Cross, Cross, Cross, Empty     ], 50),
-        ([Empty, Cross, Empty, Cross, Cross     ], 24),
-        ([Cross, Empty, Cross, Cross, Empty     ], 24),
-        ([Cross, Cross, Empty                   ], 5),
-        ([Cross, Empty, Cross, Empty            ], 5),
-        ([Cross, Empty, Empty, Empty, Empty     ], 1) ]
+        ([Circle, Circle, Circle, Circle, Empty ], -100000    ),
+        ([Circle, Circle, Circle, Empty, Circle ], -100000    ),
+        ([Circle, Circle, Empty, Circle, Circle ], -100000    ),
+        ([Empty, Circle, Circle, Circle, Empty  ], -1000      ),
+        ([Empty, Circle, Empty, Circle, Circle  ], -600       ),
+        ([Circle, Empty, Circle, Circle, Empty  ], -600       ),
+        ([Circle, Circle, Empty                 ], -10        ),
+        ([Circle, Empty, Circle, Empty          ], -10        ),
+        ([Cross, Cross, Cross, Cross, Cross     ],  100000000 ),
+        ([Cross, Cross, Cross, Cross, Empty     ],  5000      ),
+        ([Cross, Cross, Cross, Empty, Cross     ],  5000      ),
+        ([Cross, Cross, Empty, Cross, Cross     ],  5000      ),
+        ([Empty, Cross, Cross, Cross, Empty     ],  50        ),
+        ([Empty, Cross, Empty, Cross, Cross     ],  24        ),
+        ([Cross, Empty, Cross, Cross, Empty     ],  24        ),
+        ([Cross, Cross, Empty                   ],  5         ),
+        ([Cross, Empty, Cross, Empty            ],  5         ),
+        ([Cross, Empty, Empty, Empty, Empty     ],  1         ) ]
       findPatternWithMirrored p s = findPattern p s || findPattern (reverse p) s
       getPatternEntry p = find (\(r,i)->findPatternWithMirrored r p) patterns
       extractRating (Just (a,b)) = b
