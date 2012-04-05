@@ -1,11 +1,8 @@
-import List
+import Data.List
 import Control.Monad
 
 replace :: Int -> a -> [a] -> [a]
 replace index element list = (take index list) ++ [element] ++ (drop (index+1) list)
-
-findList :: (Eq a) => [a] -> [a] -> Bool
-findList sequence list = sequence `elem` concat (map inits (tails list))
 
 type Matrix a = [[a]]
 
@@ -35,8 +32,8 @@ patterns board = board ++ (transpose board) ++ (diagonals board)
 
 winner :: Board -> Maybe Mark
 winner board 
-  | any (findList [Just O, Just O, Just O, Just O, Just O]) (patterns board) = Just O
-  | any (findList [Just X, Just X, Just X, Just X, Just X]) (patterns board) = Just X
+  | any (isInfixOf [Just O, Just O, Just O, Just O, Just O]) (patterns board) = Just O
+  | any (isInfixOf [Just X, Just X, Just X, Just X, Just X]) (patterns board) = Just X
   | otherwise = Nothing
 
 aiMove :: Board -> Board
@@ -62,7 +59,7 @@ evaluate board =
         ( [Just X , Just X  , Nothing , Nothing , Nothing]    , 2 ),
         ( [Just X , Nothing , Nothing , Nothing , Nothing]    , 1 )
         ]
-      ratePattern' p = map (\(k,s) -> if (findList k p) then s else 0) knowledge
+      ratePattern' p = map (\(k,s) -> if (isInfixOf k p) then s else 0) knowledge
       ratePattern p = (ratePattern' p) ++ (ratePattern' $ reverse p)
   in sum $ concat $ map ratePattern (patterns board)
 
