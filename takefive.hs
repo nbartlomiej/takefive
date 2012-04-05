@@ -13,7 +13,7 @@ diagonal :: Matrix a -> [a]
 diagonal m = zipWith (!!) m [0..]
 
 diagonals :: Matrix a -> [[a]]
-diagonals matrix = 
+diagonals matrix =
   let tails' = tail . tails
       diagonalsNW m = map diagonal ([m] ++ tails' m ++ tails' (transpose m))
   in diagonalsNW matrix ++ diagonalsNW (map reverse matrix)
@@ -31,7 +31,7 @@ patterns :: Board -> [Pattern]
 patterns board = board ++ (transpose board) ++ (diagonals board)
 
 winner :: Board -> Maybe Mark
-winner board 
+winner board
   | any (isInfixOf [Just O, Just O, Just O, Just O, Just O]) (patterns board) = Just O
   | any (isInfixOf [Just X, Just X, Just X, Just X, Just X]) (patterns board) = Just X
   | otherwise = Nothing
@@ -53,6 +53,7 @@ evaluate board =
         ( [Just O , Just O   , Just O   , Nothing  , Just O]  , -1000 ),
         ( [Just O , Just O   , Nothing  , Just O   , Just O]  , -1000 ),
         ( [Just O , Just O   , Just O   , Nothing]            , -100 ),
+        ( [Just O , Just O   , Nothing   , Just O]            , -100 ),
         ( [Just X , Just X   , Just X   , Just X   , Just X]  , 1000000 ),
         ( [Just X , Just X  , Just X  , Just X  , Nothing]    , 100 ),
         ( [Just X , Just X  , Just X  , Nothing , Nothing]    , 4 ),
