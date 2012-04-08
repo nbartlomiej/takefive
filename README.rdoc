@@ -4,6 +4,8 @@
 
 Takefive is a Five in a Row game (http://en.wikipedia.org/wiki/Gomoku) implemented in Haskell. Runs in console, features simple AI, done as a Haskell excercise.
 
+This implementation has been used in Tfoo (github: https://github.com/nbartlomiej/tfoo , demo: http://tfoo.herokuapp.com).
+
 ==Running
 
     1. Cd into project directory
